@@ -23,8 +23,10 @@ namespace Converter
     /// </summary>
     public partial class MainWindow : Window
     {
-      
+        //Currency Admin tab password
         private const string CPassword = "admin";
+        //Entered password T/F
+        //if F hide currency admin panel
         private static bool isPasswordEntered = false;
         //Objects For
         //Sql Connection
@@ -162,6 +164,7 @@ namespace Converter
                     //Update Button
                     if (CurrencyId > 0)//Currency is not --SELECT--
                     {
+                        //Update Button Content
                         if (MessageBox.Show("Update?", "Info", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                         {
                             //DB changes after YES
@@ -182,6 +185,7 @@ namespace Converter
                     //Save Button
                     else 
                     {
+                        //Save Button Content
                         if (MessageBox.Show("Save?", "Info", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                         {
                             //DB changes after YES
@@ -197,7 +201,7 @@ namespace Converter
                             MessageBox.Show("Data save is Successfull", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
-                    ClearCurrencyMaster();
+                    ClearCurrencyAdmin();
                 }
             }
             catch(Exception ex) 
@@ -207,7 +211,7 @@ namespace Converter
         }
 
         //Method to clear all user entries
-        private void ClearCurrencyMaster()
+        private void ClearCurrencyAdmin()
         {
             try
             {
@@ -246,14 +250,62 @@ namespace Converter
             con.Close();
         }
 
+        //Cancel Button on Currency Admin Tab (Clear user inputs)
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
+            try 
+            {
+                ClearCurrencyAdmin();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
         }
 
+        //Currency Admin Data Grid Panel
         private void dgvCurrency_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
+            try 
+            {
+                //Create DataGrid object out of the sender
+                //allows to selected DataGrid object as selected object
+                DataGrid grid = (DataGrid)sender;
+                //Object for DataRowView
+                //allows to select rows in DataGrid view
+                DataRowView selected_row = grid.CurrentItem as DataRowView;
 
+                //If selected row is not null
+                if(selected_row !=null)
+                {
+                    //check if we have item in DataGrid
+                    if(dgvCurrency.Items.Count>0)
+                    {
+                        //check if selected row has value
+                        if(grid.SelectedCells.Count>0)
+                        {
+                            //Get selected row Id column value and Set in CurrencyId variable
+                            //allows to update data with PK Id number
+                            CurrencyId = Int32.Parse(selected_row["Id"].ToString());
+
+                            //Select first row in DataGrid (to edit from DB)
+                            if (grid.SelectedCells[0].Column.DisplayIndex == 0)
+                            {
+                                //Get selected row for Amount column value and update with Amount textbox
+                                txtAmount.Text = selected_row["Amount"].ToString();
+                                //Get selected row for Currency Name column value and update with Currency Name textbox
+                                txtCurrencyName.Text = selected_row["CurrencyName"].ToString() ;
+                                //Switch save button text Save to Update
+                                btnSave.Content = "Update";
+                            }
+                            //Select second row in DataGrid (to delete from DB)
+                        }
+                    }
+                }
+                else { }
+            }
+            catch { }
         }
 
         private void cmbToCurrency_SelectionChanged(object sender, SelectionChangedEventArgs e)
