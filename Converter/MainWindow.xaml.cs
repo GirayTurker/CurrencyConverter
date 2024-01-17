@@ -303,12 +303,42 @@ namespace Converter
                                 btnSave.Content = "Update";
                             }
                             //Select second row in DataGrid (to delete from DB)
+                            if (grid.SelectedCells[0].Column.DisplayIndex == 1)
+                            {
+                                if(MessageBox.Show("Are you sure you want to DELETE", "Info", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                {
+                                    try 
+                                    {
+                                        //DB Connection
+                                        dbCon();
+                                        DataTable dt = new DataTable();
+                                        //Delete query
+                                        cmd = new SqlCommand("DELETE FROM Currency_Master WHERE Id = @Id", con);
+                                        cmd.CommandType = CommandType.Text;
+                                        cmd.Parameters.AddWithValue("@Id", CurrencyId);
+                                        cmd.ExecuteNonQuery();
+                                        con.Close();
+
+                                        MessageBox.Show("Data DELETE is Successfull", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                                        ClearCurrencyAdmin();
+                                    }
+                                    catch (Exception ex) 
+                                    {
+                                        MessageBox.Show(ex.ToString());
+                                    }
+                                    
+                                }
+
+                            }
                         }
                     }
                 }
-                else { }
+               
             }
-            catch { }
+            catch(Exception ex) 
+            { 
+                MessageBox.Show(ex.ToString()); 
+            }
         }
 
         private void cmbToCurrency_SelectionChanged(object sender, SelectionChangedEventArgs e)
