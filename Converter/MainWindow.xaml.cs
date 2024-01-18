@@ -46,7 +46,7 @@ namespace Converter
             InitializeComponent();
             GetData();
             BindCurrency();
-            Collapse.Visibility = Visibility.Collapsed;
+            //Collapse.Visibility = Visibility.Collapsed;
 
             // Check if the password was previously entered
             //right click on project, Propeerties>Settings and enter the value for IsPasswordEntered
@@ -351,28 +351,45 @@ namespace Converter
 
         }
 
+        //Get Amount of selected currency from combobox (Currency Converter Tab)
         private void cmbFromCurrency_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            try
+            {
+                if (cmbFromCurrency.SelectedValue != null && int.Parse(cmbFromCurrency.SelectedValue.ToString()) !=0 && cmbFromCurrency.SelectedIndex != 0)
+                {
+                    //cmbFromCurrency.SelectedValue set in CurrencyFromId inline variable
+                    int CurrencyFromId = int.Parse(cmbFromCurrency.SelectedValue.ToString());
 
+                    dbCon();
+                    DataTable dt = new DataTable();
+                    cmd = new SqlCommand("SELECT Amount FROM Currency_Master WHERE Id = @CurrencyFromId",con);
+                    cmd.CommandType = CommandType.Text;
+
+                    if(CurrencyFromId != 0 && CurrencyFromId != null) 
+                    {
+                        cmd.Parameters.AddWithValue("@CurrencyFromId", CurrencyFromId);
+                    }
+
+                    adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        //Get amount column value from datatable and set amount value in FromAmount variable which is declared globally
+                        FromAmount = double.Parse(dt.Rows[0]["Amount"].ToString());
+                    }
+                    con.Close();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message,"Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
        
 
-        private void Tab_Control_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // Check if the selected tab is the protected tab
-            if (tbMaster.IsSelected)
-            {
-                if (isPasswordEntered == true)
-                {
-                    tbMaster.Visibility = Visibility.Visible;
-                }
-                else
-                {  // Prompt for password
-                    ShowPasswordPrompt();
-                }
-            }
-            
-        }
+        
         private void ShowPasswordPrompt()
         {
             bool passwordEntered = false;
@@ -391,21 +408,33 @@ namespace Converter
                     Collapse.Visibility = Visibility.Visible;
                     passwordEntered = true;
                 }
+                
                 else
                 {
                     // Password is incorrect, ask if the user wants to try again
                     MessageBoxResult result = MessageBox.Show("Incorrect password. Try again?", "Access Denied", MessageBoxButton.YesNo);
-
                     // If user chooses No, exit the loop
                     if (result == MessageBoxResult.No)
                     {
-                        tbMain.SelectedItem = tbConverter; // Go back to the default tab
+                        tbMain.SelectedItem = tbConverter;
                         break; 
                     }       
                 }
             }
             
             while (!passwordEntered) ;
+        }
+
+        private void Tab_Control_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (tbMain.SelectedItem == tbMaster && isPasswordEntered == true)
+            {
+                tbMaster.Visibility = Visibility.Visible;
+            }
+            if (tbMain.SelectedItem == tbMaster && isPasswordEntered == false )
+            {
+                ShowPasswordPrompt();
+            } 
         }
         // This method can be called from outside to check if the password is entered
         //public static bool CheckPasswordEntered()

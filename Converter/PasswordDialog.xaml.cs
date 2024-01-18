@@ -32,7 +32,7 @@ namespace Converter
             DialogResult = true;
         }
 
-        private void Cancel_Click(object sender, RoutedEventArgs e)
+        public void Cancel_Click(object sender, RoutedEventArgs e)
         {
             // Close the window without setting the password
             DialogResult = false;
