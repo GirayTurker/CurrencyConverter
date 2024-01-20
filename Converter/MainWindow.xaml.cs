@@ -168,10 +168,10 @@ namespace Converter
             else
             {
                 //Calculate value for conversion
-                ConvertedValue = (double.Parse(cmbFromCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text)) / double.Parse(cmbToCurrency.SelectedValue.ToString());
+                ConvertedValue = FromAmount * double.Parse(txtCurrency.Text) / ToAmount;
 
                 //label for converted value and currency name// 3 Digit for double converted value
-                lblCurrency.Content = txtCurrency.Text+" "+cmbFromCurrency.Text +" = " + ConvertedValue.ToString("N3") +" "+ cmbToCurrency.Text ;
+                lblCurrency.Content = txtCurrency.Text+" "+cmbFromCurrency.Text +" = " + ConvertedValue.ToString("") +" "+ cmbToCurrency.Text ;
             }
         }
 
