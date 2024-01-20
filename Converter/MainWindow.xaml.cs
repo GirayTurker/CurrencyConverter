@@ -39,7 +39,7 @@ namespace Converter
 
         private int CurrencyId = 0;
         private double FromAmount = 0;
-        private double TotalAmount = 0;
+        private double ToAmount = 0;
 
         public MainWindow()
         {
@@ -130,20 +130,54 @@ namespace Converter
             e.Handled = regex.IsMatch(e.Text);
         }
 
-
-        private void cmbToCurrency_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-
-        }
-
+        //Convert Button event (Currency Convert tab)
         private void Convert_Click(object sender, RoutedEventArgs e)
         {
+            //Var for converted value
+            double ConvertedValue;
 
+            // if amount is null or blank
+            if(txtCurrency.Text == null || txtCurrency.Text.Trim()=="")
+            {
+                MessageBox.Show("Conversion Amount can not be EMPTY!", "Info", MessageBoxButton.OK,MessageBoxImage.Information);
+                txtCurrency.Focus();
+                return;
+            }
+            // if TO combobox is null or select --SELECT--
+            else if(cmbToCurrency.SelectedValue == null || cmbToCurrency.SelectedIndex == 0)
+            {
+                MessageBox.Show("Select Currency TO!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                cmbToCurrency.Focus();
+                return;
+            }
+            // if FROM combobox is null or select --SELECT--
+            else if (cmbFromCurrency.SelectedValue == null || cmbFromCurrency.SelectedIndex == 0)
+            {
+                MessageBox.Show("Select Currency FROM!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                cmbFromCurrency.Focus();
+                return;
+            }
+            // if same values are slected for TO and FROM
+            else if(cmbFromCurrency.Text == cmbToCurrency.Text)
+            {
+                MessageBox.Show("From: and To: Values are the same!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                cmbFromCurrency.Focus();
+                cmbToCurrency.Focus();
+                return;
+            }
+            else
+            {
+                //Calculate value for conversion
+                ConvertedValue = (double.Parse(cmbFromCurrency.SelectedValue.ToString()) * double.Parse(txtCurrency.Text)) / double.Parse(cmbToCurrency.SelectedValue.ToString());
+
+                //label for converted value and currency name// 3 Digit for double converted value
+                lblCurrency.Content = txtCurrency.Text+" "+cmbFromCurrency.Text +" = " + ConvertedValue.ToString("N3") +" "+ cmbToCurrency.Text ;
+            }
         }
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
-
+            ClearUserInputs();
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -204,7 +238,7 @@ namespace Converter
                             MessageBox.Show("Data save is Successfull", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
-                    ClearCurrencyAdmin();
+                    ClearUserInputs();
                 }
             }
             catch(Exception ex) 
@@ -214,7 +248,7 @@ namespace Converter
         }
 
         //Method to clear all user entries
-        private void ClearCurrencyAdmin()
+        private void ClearUserInputs()
         {
             try
             {
@@ -225,6 +259,7 @@ namespace Converter
                 CurrencyId=0;
                 BindCurrency();
                 txtAmount.Focus();
+                txtCurrency.Text = string.Empty;
             }
             catch (Exception ex) 
             {
@@ -258,7 +293,7 @@ namespace Converter
         {
             try 
             {
-                ClearCurrencyAdmin();
+                ClearUserInputs();
             }
             catch (Exception ex)
             {
@@ -320,7 +355,7 @@ namespace Converter
                                         con.Close();
 
                                         MessageBox.Show("Data DELETE is Successfull", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                                        ClearCurrencyAdmin();
+                                        ClearUserInputs();
                                     }
                                     catch (Exception ex) 
                                     {
@@ -341,17 +376,62 @@ namespace Converter
             }
         }
 
+        //Get Amount of selected currency from combobox: To (Currency Converter Tab)
         private void cmbToCurrency_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            try
+            {
+                if (cmbToCurrency.SelectedValue != null && int.Parse(cmbToCurrency.SelectedValue.ToString()) != 0 && cmbToCurrency.SelectedIndex != 0)
+                {
+                    int CurrencyToId = int.Parse(cmbToCurrency.SelectedValue.ToString());
+                    dbCon();
+                    DataTable dt = new DataTable();
+                    cmd = new SqlCommand("SELECT Amount FROM Currency_Master WHERE Id = @CurrencyToId",con);
+                    cmd.CommandType = CommandType.Text;
+
+                    if (CurrencyToId != null && CurrencyToId !=0)
+                    {
+                        cmd.Parameters.AddWithValue("@CurrencyToId",CurrencyToId);
+                    }
+
+                    adapter = new SqlDataAdapter(cmd);
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        //Get amount column value from datatable and set amount value in FromAmount variable which is declared globally            
+                        ToAmount = double.Parse(dt.Rows[0]["Amount"].ToString());
+                    }
+                    con.Close();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); 
+            }
 
         }
 
+        //if the user press tab or enter key, then the selection changed event execute.
         private void cmbFromCurrency_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-
+            //If the user press Tab or Enter key then cmbFromCurrency_SelectionChanged event fire
+            if (e.Key == Key.Tab || e.SystemKey == Key.Enter)
+            {
+                cmbFromCurrency_SelectionChanged(sender, null);
+            }
         }
 
-        //Get Amount of selected currency from combobox (Currency Converter Tab)
+        private void cmbToCurrency_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            //If the user press Tab or Enter key then cmbToCurrency_SelectionChanged event fire
+            if (e.Key == Key.Tab || e.SystemKey == Key.Enter)
+            {
+                cmbToCurrency_SelectionChanged(sender, null);
+            }
+        }
+
+        //Get Amount of selected currency from combobox: From (Currency Converter Tab)
         private void cmbFromCurrency_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
