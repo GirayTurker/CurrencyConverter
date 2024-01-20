@@ -18,7 +18,7 @@
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <PublishUrl>D:\ONE-DRIVE\OneDrive - Temple University\Desktop\C#Project\DATABASES\</PublishUrl>
+    <PublishUrl>D:\ONE-DRIVE\OneDrive - Temple University\Desktop\C#Project\DATABASES\CONVERTER_DEEP_DATABASE\Converter\.idea\.idea.Converter\.idea\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -28,10 +28,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://github.com/GirayTurker/CurrencyConverter/</InstallUrl>
+    <InstallUrl>https://github.com/GirayTurker/CurrencyConverter/tree/Download/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
